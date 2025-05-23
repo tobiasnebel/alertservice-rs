@@ -5,6 +5,8 @@ use axum::{
 
 use axum_prometheus::{metrics_exporter_prometheus::PrometheusHandle, PrometheusMetricLayer};
 use sea_orm::DatabaseConnection;
+use tokio::sync::mpsc; // Added mpsc
+use models::models::processed_event_dto::ProcessedEventDto; // Added ProcessedEventDto
 
 use crate::metrics::AppMetrics;
 
@@ -20,6 +22,8 @@ use super::handlers::{
 pub struct AppState {
     pub conn: DatabaseConnection,
     pub metrics: AppMetrics,
+    pub tx_service_a: mpsc::Sender<ProcessedEventDto>,
+    pub tx_service_b: mpsc::Sender<ProcessedEventDto>,
 }
 
 // Router definition

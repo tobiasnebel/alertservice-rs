@@ -38,6 +38,9 @@ axum = { version = "0.7.5", features = ["macros"] }
 # add our local 'models' crate for importing dtos
 models = { path = "../models-rs" }
 
+# add async-trait for async traits
+async-trait = "0.1.80"
+
 # add chrono for easier timezone handling
 chrono = "0.4.38"
 

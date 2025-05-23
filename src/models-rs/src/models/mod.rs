@@ -21,3 +21,9 @@ pub mod room_dto;
 pub use self::room_dto::RoomDto;
 pub mod schedule_dto;
 pub use self::schedule_dto::ScheduleDto;
+
+pub mod processed_event_dto;
+pub use self::processed_event_dto::ProcessedEventDto;
+
+pub mod service_event_dto;
+pub use self::service_event_dto::{ServiceARelevantEvent, ServiceBRelevantEvent};

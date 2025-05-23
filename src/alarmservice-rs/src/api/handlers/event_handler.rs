@@ -2,31 +2,23 @@ use std::cmp::Ordering;
 
 use ::chrono::Timelike;
 use axum::{extract::State, http::StatusCode, Json};
-use models::models::EventDto;
+use models::models::{processed_event_dto::ProcessedEventDto, EventDto};
 use sea_orm::{
     sqlx::types::chrono::{DateTime, Utc},
-    ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter,
+    ActiveModelBehavior, ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter, Set,
 };
+use serde_json;
 use tracing::{info, warn};
 
 use crate::{
     api::{errors::CustomError, router::AppState},
-    persistence::entities::{alarm, room, schedule},
+    persistence::entities::{alarm, event_log, room, schedule},
 };
 
 pub async fn new_event_handler(
     state: State<AppState>,
     Json(event_dto): Json<EventDto>,
 ) -> Result<StatusCode, CustomError> {
-    // get room
-    let room = room::Entity::find_by_id(event_dto.room_id)
-        .one(&state.conn)
-        .await?
-        .ok_or_else(|| CustomError::NotFound)?;
-
-    // update events_counter
-    state.metrics.events_counter.increment(1);
-
     // parse timestamp (and possibly fail) or use Utc::now()
     let event_ts_actual = event_dto.clone().timestamp.map_or_else(
         || Ok::<DateTime<Utc>, CustomError>(Utc::now()), // sorry, if you didn't provide a timestamp, i'm going to use my own time here!
@@ -41,6 +33,50 @@ pub async fn new_event_handler(
             Ok(parsed)
         },
     )?;
+
+    // Create ProcessedEventDto
+    let processed_event = ProcessedEventDto {
+        event_type: event_dto.event_type.clone(),
+        room_id: Some(event_dto.room_id),
+        timestamp: event_ts_actual,
+        ref_id: event_dto.room_id.to_string(),
+        original_payload: serde_json::to_value(event_dto.clone()).unwrap_or_default(),
+    };
+
+    // Save Event Log
+    let event_log_model = event_log::ActiveModel {
+        event_type: Set(processed_event.event_type),
+        room_id: Set(processed_event.room_id),
+        timestamp: Set(processed_event.timestamp),
+        ref_id: Set(processed_event.ref_id),
+        raw_event: Set(processed_event.original_payload),
+        ..Default::default() // id will be auto-incremented
+    };
+    event_log_model.save(&state.conn).await?;
+
+    // Send event to Service A channel
+    // Clone `processed_event` for Service A, as Service B will consume the original.
+    if let Err(e) = state.tx_service_a.send(processed_event.clone()).await {
+        warn!("Failed to send event to Service A: {}", e);
+        // Depending on requirements, this could be a critical error or just logged.
+        // For now, we log and continue.
+    }
+
+    // Send event to Service B channel
+    // `processed_event` is moved here.
+    if let Err(e) = state.tx_service_b.send(processed_event).await {
+        warn!("Failed to send event to Service B: {}", e);
+    }
+    
+    // get room
+    let room = room::Entity::find_by_id(event_dto.room_id)
+        .one(&state.conn)
+        .await?
+        .ok_or_else(|| CustomError::NotFound)?;
+
+    // update events_counter
+    state.metrics.events_counter.increment(1);
+
     let mins_of_day = event_ts_actual.hour() * 60 + event_ts_actual.minute();
 
     // load schedule(s) for our room and check the event against it.
