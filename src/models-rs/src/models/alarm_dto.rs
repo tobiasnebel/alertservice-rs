@@ -17,25 +17,18 @@ use crate::models;
 use serde_derive::Serialize;
 use serde_derive::Deserialize;
 
-use tsify_next::Tsify;
 
-#[derive(Tsify, Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
+#[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct AlarmDto {
     #[serde(rename = "reason", skip_serializing_if = "Option::is_none")]
-    
     pub reason: Option<String>,
     #[serde(rename = "acknowledged", skip_serializing_if = "Option::is_none")]
-    
     pub acknowledged: Option<bool>,
     #[serde(rename = "timestamp", skip_serializing_if = "Option::is_none")]
-    
     pub timestamp: Option<String>,
     #[serde(rename = "alarmId", skip_serializing_if = "Option::is_none")]
-    
     pub alarm_id: Option<i64>,
     #[serde(rename = "roomId", skip_serializing_if = "Option::is_none")]
-    
     pub room_id: Option<i64>,
 }
 

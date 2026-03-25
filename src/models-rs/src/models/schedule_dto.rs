@@ -17,22 +17,16 @@ use crate::models;
 use serde_derive::Serialize;
 use serde_derive::Deserialize;
 
-use tsify_next::Tsify;
 
-#[derive(Tsify, Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
+#[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ScheduleDto {
     #[serde(rename = "begin", skip_serializing_if = "Option::is_none")]
-    
     pub begin: Option<i32>,
     #[serde(rename = "end", skip_serializing_if = "Option::is_none")]
-    
     pub end: Option<i32>,
     #[serde(rename = "days_of_week_mask", skip_serializing_if = "Option::is_none")]
-    
     pub days_of_week_mask: Option<i32>,
     #[serde(rename = "roomId", skip_serializing_if = "Option::is_none")]
-    
     pub room_id: Option<i64>,
 }
 

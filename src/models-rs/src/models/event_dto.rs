@@ -17,19 +17,14 @@ use crate::models;
 use serde_derive::Serialize;
 use serde_derive::Deserialize;
 
-use tsify_next::Tsify;
 
-#[derive(Tsify, Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
-#[tsify(into_wasm_abi, from_wasm_abi)]
+#[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct EventDto {
     #[serde(rename = "eventType")]
-    
     pub event_type: String,
     #[serde(rename = "roomId")]
-    
     pub room_id: i64,
     #[serde(rename = "timestamp", skip_serializing_if = "Option::is_none")]
-    
     pub timestamp: Option<String>,
 }
 

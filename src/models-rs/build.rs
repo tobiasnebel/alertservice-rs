@@ -49,7 +49,8 @@ fn main() {
     remove_dir_contents(generated_src_path_ts);
 
     // generate openapi models for rs
-    let openapi_rs_templates_path = "../openapi/templates/rust-and-tsify";
+    let openapi_rs_templates_path = "../openapi/templates/rust-custom";
+    // let openapi_rs_templates_path = "../openapi/templates/rust-and-tsify";
     let mut openapi_generate_rs_cmd = Command::new("java");
     let openapi_generate_rs_mut_cmd = openapi_generate_rs_cmd
         .arg("-jar")
