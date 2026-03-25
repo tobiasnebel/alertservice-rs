@@ -25,20 +25,59 @@ impl MigrationTrait for Migration {
             .await
             .map(|_insres| ())?;
 
-        // ################
-        // ### Schedule ###
-        // ################
+        // #################
+        // ### Schedules ###
+        // #################
         // get room from DB
-        let room = room::Entity::find_by_id(1)
+        let room_0 = room::Entity::find_by_id(1)
             .one(manager.get_connection())
             .await?
             .expect("Room with ID 1 not in DB!");
-        // create schedule for room
+        // create schedule for room_0000 (DB-id 1)
         schedule::ActiveModel {
-            begin: Set(0),                        // 00:00
-            end: Set(1439),                       // 23:59
+            begin: Set(0),                         // 00:00
+            end: Set(1439),                        // 23:59
             days_of_week_mask: Set(0b01111111i32), // all days of the week
-            room_id: Set(room.id),
+            room_id: Set(room_0.id),
+            ..Default::default()
+        }
+        .save(manager.get_connection())
+        .await?;
+
+        let room_1 = room::Entity::find_by_id(2)
+            .one(manager.get_connection())
+            .await?
+            .expect("Room with ID 1 not in DB!");
+        // create schedule for room_0001 (DB-id 2)
+        schedule::ActiveModel {
+            begin: Set(0),                         // 00:00
+            end: Set(1439),                        // 23:59
+            days_of_week_mask: Set(0b01100000i32), // weekends only
+            room_id: Set(room_1.id),
+            ..Default::default()
+        }
+        .save(manager.get_connection())
+        .await?;
+
+        let room_2 = room::Entity::find_by_id(3)
+            .one(manager.get_connection())
+            .await?
+            .expect("Room with ID 1 not in DB!");
+        // create schedule for room_0002 (DB-id 3)
+        schedule::ActiveModel {
+            begin: Set(1320),                      // 22:00
+            end: Set(1439),                        // 23:59
+            days_of_week_mask: Set(0b01111111i32), // all days of the week
+            room_id: Set(room_2.id),
+            ..Default::default()
+        }
+        .save(manager.get_connection())
+        .await?;
+        schedule::ActiveModel {
+            begin: Set(0),                         // 00:00
+            end: Set(360),                         // 06:00
+            days_of_week_mask: Set(0b01111111i32), // all days of the week
+            room_id: Set(room_2.id),
             ..Default::default()
         }
         .save(manager.get_connection())
