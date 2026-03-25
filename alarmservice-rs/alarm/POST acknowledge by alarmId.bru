@@ -1,0 +1,19 @@
+meta {
+  name: POST acknowledge by alarmId
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/alarm/{{alarm_id}}/acknowledge
+  body: none
+  auth: none
+}
+
+params:query {
+  : 
+}
+
+vars:pre-request {
+  alarm_id: 1
+}

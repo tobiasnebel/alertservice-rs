@@ -1,0 +1,19 @@
+meta {
+  name: POST event
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{url}}/event
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "roomId": 1,
+      "eventType": "WINDOW",
+      "timestamp": "2024-09-09T21:00:00Z"
+  }
+}

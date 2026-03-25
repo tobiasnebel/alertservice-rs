@@ -1,0 +1,15 @@
+meta {
+  name: GET by roomId
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/schedule?roomId=3
+  body: none
+  auth: none
+}
+
+params:query {
+  roomId: 3
+}

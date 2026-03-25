@@ -1,0 +1,16 @@
+meta {
+  name: GET by roomId
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{url}}/alarm?roomId=1&page=0
+  body: none
+  auth: none
+}
+
+params:query {
+  roomId: 1
+  page: 0
+}
