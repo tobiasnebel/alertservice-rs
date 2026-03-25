@@ -1,0 +1,5 @@
+{
+    "roomId": 1,
+    "eventType": "WINDOW",
+    "timestamp": "2024-09-09T21:00:00Z"
+}
